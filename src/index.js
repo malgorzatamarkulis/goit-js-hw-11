@@ -55,8 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const response = await axios.get(URL, { params });
             const { length } = response.data.hits;
-            console.log('length :', length);
-
             if (length === 0) {
                 notification.failure(
                     'Sorry, there are no images matching your search query. Please try again.'
@@ -65,11 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (length < 40) {
-                if (resetPage) {
-                    Notiflix.Notify.warning(
-                        "We're sorry, but you've reached the end of search results."
-                    );
-                }
+                Notiflix.Notify.warning(
+                    "We're sorry, but you've reached the end of search results."
+                );
+                resetPage = true;
                 loadMore.style.display = 'none';
                 processImages(response.data.hits);
                 page++;
