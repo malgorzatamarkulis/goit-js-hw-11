@@ -54,24 +54,35 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         try {
             const response = await axios.get(URL, { params });
-            if (response.data.hits.length > 0) {
-                processImages(response.data.hits);
-            } else {
+            const { length } = response.data.hits;
+            console.log('length :', length);
+
+            if (length === 0) {
                 notification.failure(
                     'Sorry, there are no images matching your search query. Please try again.'
                 );
+                return;
             }
-            if (response.data.hits.length === 0 || response.data.hits.length < 40) {
-                loadMore.style.display = 'none';
-                if (!resetPage) {
+
+            if (length < 40) {
+                if (resetPage) {
                     Notiflix.Notify.warning(
                         "We're sorry, but you've reached the end of search results."
                     );
                 }
-            } else {
-                loadMore.style.display = 'flex';
+                loadMore.style.display = 'none';
+                processImages(response.data.hits);
+                page++;
+                return;
             }
-            page++;
+
+            if (length === 40) {
+                loadMore.style.display = 'block'
+                processImages(response.data.hits);
+                page++;
+                return;
+            }
+
         } catch (error) {
             console.error('Error:', error);
             Notiflix.Notify.failure('Error! Try again later!');
@@ -115,6 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
         smoothScroll();
     }
     loadMore.addEventListener('click', () => {
+
         searchImg(currentQuery);
     });
 });
